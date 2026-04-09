@@ -14,13 +14,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
+/**
+ * Classe représentant un membre.
+ *
+ * @author Rodolphe BRUCKER
+ * @version 1.0.0
+ * @since 09/04/2026
+ */
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "membre")
 public class Membre {
-    //==== Variables ====
     /**
      * Identifiant du membre.
      */
