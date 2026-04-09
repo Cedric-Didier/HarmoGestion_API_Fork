@@ -10,6 +10,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.LocalDateTime;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,8 +31,7 @@ class CoursControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final String json = new ObjectMapper()
-            .writeValueAsString(new Cours());
+    private final Cours cours = new Cours(null, LocalDateTime.now(), (byte) 45);
 
 
     @MockitoBean
@@ -50,25 +51,43 @@ class CoursControllerTest {
     }
 
     @Test
-    void createCoursTest() throws Exception {
+    void createCoursTestOk() throws Exception {
+
+        final String json = new ObjectMapper().writeValueAsString(cours);
 
         mockMvc.perform(post("/cours")
                                 .content(json)
                                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void createCoursTestKo() throws Exception {
+
+        cours.setIdCours(1);
+        final String json = new ObjectMapper().writeValueAsString(cours);
+
+        mockMvc.perform(post("/cours")
+                                .content(json)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void updateCoursTest() throws Exception {
 
+        final String json = new ObjectMapper().writeValueAsString(cours);
+
         mockMvc.perform(put("/cours/1")
                                 .content(json)
                                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNotFound());
     }
 
     @Test
     void deleteCoursTest() throws Exception {
+
+        final String json = new ObjectMapper().writeValueAsString(cours);
 
         mockMvc.perform(delete("/cours/1")
                                 .content(json)

@@ -77,18 +77,24 @@ public class CoursController {
      *
      * @param cours  Cours : cours à créer
      * @param result BindingResult : erreurs de validation par rapport au model
-     * @return Cours : cours créé.
+     * @return Réponse avec le cours créé et un statut 201,
+     * ou un statut 400 ou 500 pour une erreur.
      */
     @PostMapping("/cours")
-    public Cours createCours(
-            @Valid
+    public ResponseEntity<Cours> createCours(
             @RequestBody
+            @Valid
             final Cours cours, final BindingResult result) {
 
         if (cours.getIdCours() != null || result.hasErrors()) {
-            return new ResponseEntity<Cours>(HttpStatus.BAD_REQUEST).getBody();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            return coursService.saveCours(cours);
+            try {
+                Cours savedCours = coursService.saveCours(cours);
+                return new ResponseEntity<>(savedCours, HttpStatus.CREATED);
+            } catch (Exception _) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
@@ -98,20 +104,32 @@ public class CoursController {
      * @param id     int : identifiant du cours à modifier
      * @param cours  Cours : cours à modifier
      * @param result BindingResult : erreurs de validation par rapport au model
-     * @return Cours : cours modifié.
+     * @return Réponse avec le cours modifié avec un statut 200,
+     * ou un statut 400 ou 500 pour une erreur.
      */
     @PutMapping("/cours/{id}")
-    public Cours updateCours(
+    public ResponseEntity<Object> updateCours(
             @PathVariable
             final int id,
             @Valid
             @RequestBody
             final Cours cours, final BindingResult result) {
 
+        Optional<Cours> optionalInstrument = coursService.getCours(id);
+        if (optionalInstrument.isEmpty()) {
+            // Aucun cours n'a l'identifiant donné dans l'URL.
+            return new ResponseEntity<>("La ressource n'est pas disponible.",
+                                        HttpStatus.NOT_FOUND);
+        }
         if (getCours(id) == null || result.hasErrors()) {
-            return new ResponseEntity<Cours>(HttpStatus.BAD_REQUEST).getBody();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            return coursService.saveCours(cours);
+            try {
+                Cours savedCours = coursService.saveCours(cours);
+                return new ResponseEntity<>(savedCours, HttpStatus.OK);
+            } catch (Exception _) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
