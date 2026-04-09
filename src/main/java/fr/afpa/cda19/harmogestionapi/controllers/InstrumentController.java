@@ -128,50 +128,49 @@ public class InstrumentController {
             @Valid
             final Instrument instrument, final BindingResult result) {
         Optional<Instrument> optionalInstrument = service.getInstrument(id);
-        if (optionalInstrument.isPresent()) {
-            Instrument currentInstrument = optionalInstrument.get();
-            // Vérification de la correspondance entre l'identifiant de l'URL
-            // et l'identifiant de l'instrument donné en paramètre.
-            if (instrument.getIdInstrument() != id) {
-                return new ResponseEntity<>("L'instrument en paramètre n'a pas "
-                                            + "le même identifiant",
-                                            HttpStatus.BAD_REQUEST);
-            }
-            // Récupèration des éventuelles erreurs de validation du libellé de
-            // l'instrument
-            FieldError error = result.getFieldError("libelleInstrument");
-            if (error != null) {
-                return new ResponseEntity<>(error.getDefaultMessage(),
-                                            HttpStatus.BAD_REQUEST);
-            }
-            String libelle = instrument.getLibelleInstrument();
-            // Vérification de la présence d'une modification du nom de
-            // l'instrument
-            if (libelle != null && libelle.compareTo(
-                    currentInstrument.getLibelleInstrument()) != 0) {
-                currentInstrument.setLibelleInstrument(libelle);
-                try {
-                    service.saveInstrument(currentInstrument);
-                } catch (DataIntegrityViolationException dive) {
-                    SQLException sqle = (SQLException) dive.getRootCause();
-                    if (sqle != null && sqle.getErrorCode() == 1062) {
-                        // Violation de l'unicité des libellés des instruments
-                        return new ResponseEntity<>(
-                                "Cet instrument existe déjà.",
-                                HttpStatus.BAD_REQUEST);
-                    } else {
-                        return new ResponseEntity<>(
-                                "Erreur inconnue.",
-                                HttpStatus.INTERNAL_SERVER_ERROR);
-                    }
-                }
-            }
-            return new ResponseEntity<>(currentInstrument, HttpStatus.OK);
-        } else {
+        if (optionalInstrument.isEmpty()) {
             // Aucun instrument n'a l'identifiant donné dans l'URL.
             return new ResponseEntity<>("La ressource n'est pas disponible.",
                                         HttpStatus.NOT_FOUND);
         }
+        Instrument currentInstrument = optionalInstrument.get();
+        // Vérification de la correspondance entre l'identifiant de l'URL
+        // et l'identifiant de l'instrument donné en paramètre.
+        if (instrument.getIdInstrument() != id) {
+            return new ResponseEntity<>("L'instrument en paramètre n'a pas "
+                                        + "le même identifiant",
+                                        HttpStatus.BAD_REQUEST);
+        }
+        // Récupèration des éventuelles erreurs de validation du libellé de
+        // l'instrument
+        FieldError error = result.getFieldError("libelleInstrument");
+        if (error != null) {
+            return new ResponseEntity<>(error.getDefaultMessage(),
+                                        HttpStatus.BAD_REQUEST);
+        }
+        String libelle = instrument.getLibelleInstrument();
+        // Vérification de la présence d'une modification du nom de
+        // l'instrument
+        if (libelle != null && libelle.compareTo(
+                currentInstrument.getLibelleInstrument()) != 0) {
+            currentInstrument.setLibelleInstrument(libelle);
+            try {
+                service.saveInstrument(currentInstrument);
+            } catch (DataIntegrityViolationException dive) {
+                SQLException sqle = (SQLException) dive.getRootCause();
+                if (sqle != null && sqle.getErrorCode() == 1062) {
+                    // Violation de l'unicité des libellés des instruments
+                    return new ResponseEntity<>(
+                            "Cet instrument existe déjà.",
+                            HttpStatus.BAD_REQUEST);
+                } else {
+                    return new ResponseEntity<>(
+                            "Erreur inconnue.",
+                            HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+        }
+        return new ResponseEntity<>(currentInstrument, HttpStatus.OK);
     }
 
     /**
