@@ -30,7 +30,8 @@ class CoursControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final Cours cours = new Cours();
+    private final String json = new ObjectMapper()
+            .writeValueAsString(new Cours());
 
 
     @MockitoBean
@@ -53,7 +54,7 @@ class CoursControllerTest {
     void createCoursTest() throws Exception {
 
         mockMvc.perform(post("/cours")
-                                .content(new ObjectMapper().writeValueAsString(cours))
+                                .content(json)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -62,7 +63,7 @@ class CoursControllerTest {
     void updateCoursTest() throws Exception {
 
         mockMvc.perform(put("/cours/1")
-                                .content(new ObjectMapper().writeValueAsString(cours))
+                                .content(json)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -71,7 +72,7 @@ class CoursControllerTest {
     void deleteCoursTest() throws Exception {
 
         mockMvc.perform(delete("/cours/1")
-                                .content(new ObjectMapper().writeValueAsString(cours))
+                                .content(json)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
