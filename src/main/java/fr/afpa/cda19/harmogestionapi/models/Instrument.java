@@ -40,7 +40,7 @@ public class Instrument {
     @Column(name = "libelle_instrument", unique = true, length = 50,
             nullable = false)
     @NotBlank(message = "Un instrument doit avoir un nom")
-    @Size(min = 2, max = 50,
+    @Size(min = 3, max = 50,
           message = "Le nom de l'instrument doit faire entre trois "
                     + "et cinquante caractères de long")
     private String libelleInstrument;
