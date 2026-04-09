@@ -105,16 +105,10 @@ public class InstrumentController {
      * ou message d'erreur avec un code 404
      */
     @GetMapping("/instrument/{id}")
-    public ResponseEntity<Object> getInstrument(
+    public Optional<Instrument> getInstrument(
             @PathVariable
             final int id) {
-        Optional<Instrument> instrument = service.getInstrument(id);
-        if (instrument.isEmpty()) {
-            return new ResponseEntity<>("La ressource n'est pas disponible.",
-                                        HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(instrument.get(), HttpStatus.OK);
-        }
+        return service.getInstrument(id);
     }
 
     /**
