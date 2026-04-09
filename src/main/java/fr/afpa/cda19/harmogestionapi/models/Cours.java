@@ -35,30 +35,48 @@ import java.util.ArrayList;
 @Table(name = "cours")
 public class Cours {
 
+    /**
+     * Identifiant.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cours")
     private Integer idCours;
 
+    /**
+     * Date du cours.
+     */
     @Column(name = "date_cours", nullable = false)
     @NotNull(message = "Le cours doit avoir une date")
     private LocalDateTime dateCours;
 
+    /**
+     * Durée du cours (en min).
+     */
     @Column(name = "duree_cours", nullable = false)
     @Min(value = 30, message = "Le cours doit durer au moins 10 minutes")
     @Max(value = 120, message = "Le cours doit durer au maximum 120 minutes")
     private byte dureeCours;
 
+    /**
+     * Enseignant.
+     */
     @ManyToOne
     @JoinColumn(name = "id_membre_enseignant", nullable = false)
     @Valid
     private Membre enseignant;
 
+    /**
+     * Instrument enseigné.
+     */
     @ManyToOne
     @JoinColumn(name = "id_instrument", nullable = false)
     @Valid
     private Instrument instrument;
 
+    /**
+     * Liste des apprenants.
+     */
     @ManyToMany
     @JoinTable(
             name = "Participer_Cours",
