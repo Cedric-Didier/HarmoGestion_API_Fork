@@ -43,7 +43,7 @@ public class Membre {
     @NotBlank(message = "Un membre doit avoir un nom.")
     @Size(min = 3, max = 30,
           message = "Le nom du membre doit faire entre trois "
-                    + "et trente caractères de long.")
+                    + "et cinquante caractères de long")
     private String nomMembre;
 
     /**
