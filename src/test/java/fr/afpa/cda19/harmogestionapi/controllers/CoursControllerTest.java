@@ -1,6 +1,8 @@
 package fr.afpa.cda19.harmogestionapi.controllers;
 
 import fr.afpa.cda19.harmogestionapi.models.Cours;
+import fr.afpa.cda19.harmogestionapi.models.Instrument;
+import fr.afpa.cda19.harmogestionapi.models.Membre;
 import fr.afpa.cda19.harmogestionapi.services.CoursService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,7 +35,12 @@ class CoursControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final Cours cours = new Cours(null, LocalDateTime.now(), (byte) 45);
+    private final Cours cours =
+            new Cours(null, LocalDateTime.now(), (byte) 45,
+                      new Membre(1, "Seiwert",
+                                 "Thomas", LocalDate.now()),
+                      new Instrument(1, "guitare"),
+                      new ArrayList<>());
 
 
     @MockitoBean
@@ -53,6 +62,8 @@ class CoursControllerTest {
     @Test
     void createCoursTestOk() throws Exception {
 
+        cours.getParticipants().add(new Membre(2, "Hendrix",
+                                               "Jimmi", LocalDate.now()));
         final String json = new ObjectMapper().writeValueAsString(cours);
 
         mockMvc.perform(post("/cours")

@@ -1,11 +1,14 @@
 package fr.afpa.cda19.harmogestionapi.controllers;
 
 import fr.afpa.cda19.harmogestionapi.models.Cours;
+import fr.afpa.cda19.harmogestionapi.models.Membre;
 import fr.afpa.cda19.harmogestionapi.services.CoursService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -81,19 +84,32 @@ public class CoursController {
      * ou un statut 400 ou 500 pour une erreur.
      */
     @PostMapping("/cours")
-    public ResponseEntity<Cours> createCours(
+    public ResponseEntity<Object> createCours(
             @RequestBody
             @Valid
             final Cours cours, final BindingResult result) {
 
-        if (cours.getIdCours() != null || result.hasErrors()) {
+        if (cours.getIdCours() != null || result.hasErrors() ||
+            cours.getEnseignant().getIdMembre() == null ||
+            cours.getInstrument().getIdInstrument() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
+            for (Membre participant : cours.getParticipants()) {
+                if (participant.getIdMembre() == null) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+            }
             try {
                 Cours savedCours = coursService.saveCours(cours);
                 return new ResponseEntity<>(savedCours, HttpStatus.CREATED);
+            } catch (DataIntegrityViolationException _) {
+                return new ResponseEntity<>("L'enseignant, l'instrument, "
+                                            + "ou l'un des participants "
+                                            + "n'existe pas.",
+                                            HttpStatus.NOT_FOUND);
             } catch (Exception _) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>("Erreur inconnue.",
+                                            HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }
@@ -121,14 +137,27 @@ public class CoursController {
             return new ResponseEntity<>("La ressource n'est pas disponible.",
                                         HttpStatus.NOT_FOUND);
         }
-        if (getCours(id) == null || result.hasErrors()) {
+        if (cours.getIdCours() == null || result.hasErrors() ||
+            cours.getEnseignant().getIdMembre() == null ||
+            cours.getInstrument().getIdInstrument() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
+            for (Membre participant : cours.getParticipants()) {
+                if (participant.getIdMembre() == null) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+            }
             try {
                 Cours savedCours = coursService.saveCours(cours);
                 return new ResponseEntity<>(savedCours, HttpStatus.OK);
+            } catch (ObjectRetrievalFailureException _) {
+                return new ResponseEntity<>("L'enseignant, l'instrument, "
+                                            + "ou l'un des participants "
+                                            + "n'existe pas.",
+                                            HttpStatus.NOT_FOUND);
             } catch (Exception _) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>("Erreur inconnue.",
+                                            HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }

@@ -14,12 +14,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Model des cours.
@@ -54,7 +55,7 @@ public class Cours {
      * Durée du cours (en min).
      */
     @Column(name = "duree_cours", nullable = false)
-    @Min(value = 30, message = "Le cours doit durer au moins 10 minutes")
+    @Min(value = 30, message = "Le cours doit durer au moins 30 minutes")
     @Max(value = 120, message = "Le cours doit durer au maximum 120 minutes")
     private byte dureeCours;
 
@@ -75,7 +76,7 @@ public class Cours {
     private Instrument instrument;
 
     /**
-     * Liste des apprenants.
+     * Liste des participants.
      */
     @ManyToMany
     @JoinTable(
@@ -83,5 +84,8 @@ public class Cours {
             joinColumns = @JoinColumn(name = "id_cours"),
             inverseJoinColumns = @JoinColumn(name = "id_membre_apprenant")
     )
-    private ArrayList<Membre> participants;
+    @NotNull(message = "Le cours doit avoir des participants")
+    @Size(min = 1, max = 15, message = "Le nombre de participants doit être "
+                                       + "entre 1 et 15")
+    private List<@Valid Membre> participants;
 }
