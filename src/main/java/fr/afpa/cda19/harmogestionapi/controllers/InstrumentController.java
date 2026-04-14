@@ -64,12 +64,15 @@ public class InstrumentController {
      * ou un message d'erreur avec un code 400 ou 500
      */
     @PostMapping("/instrument")
-    public ResponseEntity<Object> createInstrument(
+    public ResponseEntity<Instrument> createInstrument(
             @RequestBody
             @Valid
             final Instrument instrument, final BindingResult result) {
+        Instrument errorResult = new Instrument();
         if (instrument.getIdInstrument() != null) {
             // L'instrument dans la requête ne doit pas avoir d'identifiant
+            errorResult.setLibelleInstrument("L'instrument ne doit pas avoir "
+                                             + "d'identifiant");
             return new ResponseEntity<>((Instrument) null,
                                         HttpStatus.BAD_REQUEST);
         }
@@ -77,8 +80,8 @@ public class InstrumentController {
         // l'instrument
         FieldError error = result.getFieldError("libelleInstrument");
         if (error != null) {
-            return new ResponseEntity<>(error.getDefaultMessage(),
-                                        HttpStatus.BAD_REQUEST);
+            errorResult.setLibelleInstrument(error.getDefaultMessage());
+            return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
         }
         try {
             // Enregistrement de l'instrument
@@ -88,10 +91,12 @@ public class InstrumentController {
             SQLException sqle = (SQLException) dive.getRootCause();
             if (sqle != null && sqle.getErrorCode() == 1062) {
                 // Violation de l'unicité des libellés des instruments
-                return new ResponseEntity<>("Cet instrument existe déjà.",
+                errorResult.setLibelleInstrument("Cet instrument existe déjà.");
+                return new ResponseEntity<>(errorResult,
                                             HttpStatus.BAD_REQUEST);
             } else {
-                return new ResponseEntity<>("Erreur inconnue.",
+                errorResult.setLibelleInstrument("Erreur inconnue.");
+                return new ResponseEntity<>(errorResult,
                                             HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
@@ -121,31 +126,41 @@ public class InstrumentController {
      * ou un message d'erreur avec un code 400 ou 500
      */
     @PutMapping("/instrument/{id}")
-    public ResponseEntity<Object> updateInstrument(
+    public ResponseEntity<Instrument> updateInstrument(
             @PathVariable
             final int id,
             @RequestBody
             @Valid
             final Instrument instrument, final BindingResult result) {
+        /*
+        Instance d'instrument utilisée pour envoyer les messages d'erreur
+        accompagnée du code retour BAD_REQUEST, NOT_FOUND,
+        ou INTERNAL_SERVER_ERROR
+        */
+        Instrument errorResult = new Instrument();
         Optional<Instrument> optionalInstrument = service.getInstrument(id);
         if (optionalInstrument.isEmpty()) {
             // Aucun instrument n'a l'identifiant donné dans l'URL.
-            return new ResponseEntity<>("La ressource n'est pas disponible.",
+            errorResult.setLibelleInstrument("La ressource n'est pas "
+                                             + "disponible.");
+            return new ResponseEntity<>(errorResult,
                                         HttpStatus.NOT_FOUND);
         }
         Instrument currentInstrument = optionalInstrument.get();
         // Vérification de la correspondance entre l'identifiant de l'URL
         // et l'identifiant de l'instrument donné en paramètre.
         if (instrument.getIdInstrument() != id) {
-            return new ResponseEntity<>("L'instrument en paramètre n'a pas "
-                                        + "le même identifiant",
+            errorResult.setLibelleInstrument("L'instrument en paramètre n'a pas"
+                                             + " le même identifiant");
+            return new ResponseEntity<>(errorResult,
                                         HttpStatus.BAD_REQUEST);
         }
         // Récupèration des éventuelles erreurs de validation du libellé de
         // l'instrument
         FieldError error = result.getFieldError("libelleInstrument");
         if (error != null) {
-            return new ResponseEntity<>(error.getDefaultMessage(),
+            errorResult.setLibelleInstrument(error.getDefaultMessage());
+            return new ResponseEntity<>(errorResult,
                                         HttpStatus.BAD_REQUEST);
         }
         String libelle = instrument.getLibelleInstrument();
@@ -160,13 +175,16 @@ public class InstrumentController {
                 SQLException sqle = (SQLException) dive.getRootCause();
                 if (sqle != null && sqle.getErrorCode() == 1062) {
                     // Violation de l'unicité des libellés des instruments
-                    return new ResponseEntity<>(
-                            "Cet instrument existe déjà.",
-                            HttpStatus.BAD_REQUEST);
+                    errorResult.setLibelleInstrument("Cet instrument existe "
+                                                     + "déjà.");
+                    return new ResponseEntity<>(errorResult,
+                                                HttpStatus.BAD_REQUEST);
                 } else {
+                    errorResult.setLibelleInstrument("Erreur inconnue.");
                     return new ResponseEntity<>(
-                            "Erreur inconnue.",
-                            HttpStatus.INTERNAL_SERVER_ERROR);
+                            errorResult,
+                            HttpStatus.INTERNAL_SERVER_ERROR
+                    );
                 }
             }
         }
