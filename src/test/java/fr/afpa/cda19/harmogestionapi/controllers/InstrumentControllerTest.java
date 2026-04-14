@@ -34,7 +34,7 @@ class InstrumentControllerTest {
 
     @Test
     void getInstrumentTestKo() throws Exception {
-        mockMvc.perform(get("/instrument/1")).andExpect(status().isOk());
+        mockMvc.perform(get("/instrument/1")).andExpect(status().isNotFound());
     }
 
     @Test
