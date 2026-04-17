@@ -16,5 +16,5 @@ jobs:
               run: |
                   ls ${{ github.workspace }}
             - name: List files in the directory ${{ github.workspace }}/src/main/java/fr/afpa/cda19/harmogestionapi
-              run: cd src/main/java/fr/afpa/cda19/harmogestionapi | ls
+              run: ls ${{ github.workspace }}/src/main/java/fr/afpa/cda19/harmogestionapi
             - run: echo "🍏 This job's status is ${{ job.status }}."
