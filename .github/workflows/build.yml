@@ -3,12 +3,25 @@ on:
     push:
         branches:
             - main
+        paths:
+            - 'src/**'
+            - '.github/workflows/**'
+            - pom.xml
     pull_request:
         types: [opened, synchronize, reopened]
 jobs:
     build:
         name: Build and analyze
         runs-on: ubuntu-latest
+        services:
+            mysql_server:
+                image: mysql:8.0
+                env:
+                    MYSQL_ROOT_PASSWORD: ${{secrets.DB_PASSWORD}}
+                    MYSQL_DATABASE: ${{secrets.DB_NAME}}
+                ports:
+                    - 3306:3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
         steps:
             - uses: actions/checkout@v5
               with:
@@ -30,7 +43,19 @@ jobs:
                   path: ~/.m2
                   key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
                   restore-keys: ${{ runner.os }}-m2
+            - name: wait_for_MySQL_to_be_ready
+              run: |
+                  while ! mysqladmin ping -h"127.0.0.1" -P"3306" --silent; do
+                    sleep 1
+                  done
+            - name: create_database_from_script
+              run: mysql -h 127.0.0.1 -u root -p${{secrets.DB_PASSWORD}} ${{secrets.DB_NAME}} < script/script.sql
             - name: Build and analyze
               env:
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-              run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Cedric-Didier_HarmoGestion_API_Fork
+                  HARMOGESTION_CI_DB_URL: jdbc:mysql://localhost:3306/${{secrets.DB_NAME}}
+                  HARMOGESTION_CI_DB_USERNAME: root
+                  HARMOGESTION_CI_DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+                  HARMOGESTION_CI_DB_DRIVER: com.mysql.cj.jdbc.Driver
+                  HARMOGESTION_CI_DB_DIALECT: org.hibernate.dialect.MySQLDialect
+              run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Cedric-Didier_HarmoGestion_API_Fork -Dci=true
