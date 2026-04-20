@@ -69,6 +69,20 @@
             <scope>test</scope>
         </dependency>
 	</dependencies>
+    <profiles>
+        <profile>
+            <id>ci</id>
+            <properties>
+                <env>src/main/resources/application-ci.properties</env>
+            </properties>
+            <activation>
+                <property>
+                    <name>ci</name>
+                    <value>true</value>
+                </property>
+            </activation>
+        </profile>
+    </profiles>
 	<build>
 		<plugins>
 			<plugin>
