@@ -52,7 +52,7 @@ jobs:
               env:
                   DB_PASSWORD: ${{secrets.DB_PASSWORD}}
                   DB_NAME: ${{secrets.DB_NAME}}
-              run: mysql -h 127.0.0.1 -u root -p${{DB_PASSWORD}} ${{DB_NAME}} < ${{ github.workspace }}/script_bdd/script.sql
+              run: mysql -h 127.0.0.1 -u root -p$DB_PASSWORD $DB_NAME < ${{ github.workspace }}/script_bdd/script.sql
             - name: Build and analyze
               env:
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
