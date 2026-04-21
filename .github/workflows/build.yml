@@ -68,17 +68,3 @@ jobs:
                 name: harmogestionAPI.jar
                 path: target/*.jar
                 retention-days: 1
-    Team_Notification:
-        name: MS Teams notif
-        runs-on: ubuntu-latest
-        needs: build
-        steps:
-            - uses: jdcargile/ms-teams-notification@v1.4
-              if: success()
-              with:
-                github-token: ${{github.token}}
-                ms-teams-webhook-uri: ${{secrets.TEAMS_WEBHOOK_URI}}
-                notification-summary: Build finished !
-                notification-color: 17B87D
-                timezone: Paris
-                verbose-logging: true
