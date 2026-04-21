@@ -4,7 +4,6 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 data.properties
-application.properties
 
 ### Log, target and Javadoc ###
 *.log
