@@ -62,9 +62,9 @@ jobs:
                   HARMOGESTION_CI_DB_DRIVER: com.mysql.cj.jdbc.Driver
                   HARMOGESTION_CI_DB_DIALECT: org.hibernate.dialect.MySQLDialect
               run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Cedric-Didier_HarmoGestion_API_Fork -Dspring.profiles.active=ci
-            - name: Charging artefact
+            - name: Charging artifact
               uses: actions/upload-artifact@v4
               with:
-                name: harmogestionAPI.jar
+                name: harmogestionAPI-jar
                 path: target/*.jar
                 retention-days: 1
