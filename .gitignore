@@ -4,6 +4,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 data.properties
+docker-compose.yml
+docker-compose.yaml
 
 ### Log, target and Javadoc ###
 *.log

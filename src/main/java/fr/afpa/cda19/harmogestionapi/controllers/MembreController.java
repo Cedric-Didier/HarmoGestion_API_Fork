@@ -183,7 +183,7 @@ public class MembreController {
         }
         try {
             service.saveMembre(currentMembre);
-        } catch (DataIntegrityViolationException dive) {
+        } catch (DataIntegrityViolationException _) {
             return new ResponseEntity<>(
                     "Erreur inconnue.",
                     HttpStatus.INTERNAL_SERVER_ERROR);

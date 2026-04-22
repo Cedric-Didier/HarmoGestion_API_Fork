@@ -10,7 +10,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -64,7 +63,7 @@ public class Cours {
      */
     @ManyToOne
     @JoinColumn(name = "id_membre_enseignant", nullable = false)
-    @Valid
+    @NotNull
     private Membre enseignant;
 
     /**
@@ -72,7 +71,7 @@ public class Cours {
      */
     @ManyToOne
     @JoinColumn(name = "id_instrument", nullable = false)
-    @Valid
+    @NotNull
     private Instrument instrument;
 
     /**
@@ -87,5 +86,5 @@ public class Cours {
     @NotNull(message = "Le cours doit avoir des participants")
     @Size(min = 1, max = 15, message = "Le nombre de participants doit être "
                                        + "entre 1 et 15")
-    private List<@Valid Membre> participants;
+    private List<Membre> participants;
 }

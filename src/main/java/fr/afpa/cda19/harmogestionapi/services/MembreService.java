@@ -1,6 +1,5 @@
 package fr.afpa.cda19.harmogestionapi.services;
 
-import fr.afpa.cda19.harmogestionapi.models.Instrument;
 import fr.afpa.cda19.harmogestionapi.repositories.MembreRepository;
 import fr.afpa.cda19.harmogestionapi.models.Membre;
 import org.springframework.beans.factory.annotation.Autowired;
