@@ -9,6 +9,12 @@ on:
             - pom.xml
     pull_request:
         types: [opened, synchronize, reopened]
+        branches:
+            - main
+        paths:
+            - 'src/**'
+            - '.github/workflows/**'
+            - pom.xml
 jobs:
     build:
         name: Build and analyze
