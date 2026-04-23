@@ -3,6 +3,7 @@ package fr.afpa.cda19.harmogestionapi.services;
 import fr.afpa.cda19.harmogestionapi.models.Instrument;
 import fr.afpa.cda19.harmogestionapi.repositories.InstrumentRepository;
 import fr.afpa.cda19.harmogestionapi.repositories.PratiquerRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,12 @@ public class InstrumentService {
      */
     private final PratiquerRepository pratiquerRepository;
 
+    /**
+     * Initialisation du service des instruments.
+     *
+     * @param instrumentRepository repository des instruments
+     * @param pratiquerRepository  repository de l'entité Pratiquer
+     */
     @Autowired
     public InstrumentService(final InstrumentRepository instrumentRepository,
                              final PratiquerRepository pratiquerRepository) {
@@ -61,10 +68,9 @@ public class InstrumentService {
      *
      * @param id l'identifiant de l'instrument à supprimer
      */
+    @Transactional
     public void deleteInstrument(int id) {
-        Optional<Instrument> potentialInstrument = getInstrument(id);
-        potentialInstrument.ifPresent(
-                pratiquerRepository::deleteAllByInstrument);
+        pratiquerRepository.deleteAllByIdInstrument(id);
         instrumentRepository.deleteById(id);
     }
 
@@ -74,6 +80,7 @@ public class InstrumentService {
      * @param instrument l'instrument à créer ou modifier
      * @return l'instrument après création ou modification
      */
+    @Transactional
     public Instrument saveInstrument(Instrument instrument) {
         return instrumentRepository.save(instrument);
     }
