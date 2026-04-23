@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @RestController
 public class PratiquerController {
 
-    private static final Pattern ID_REGEX = Pattern.compile("^.*(id_\\w+).*$");
+    private static final Pattern ID_REGEX = Pattern.compile("(id_\\w+)");
 
     private final PratiquerService service;
 
@@ -105,7 +105,7 @@ public class PratiquerController {
             if (sqle != null && sqle.getErrorCode() == 1452) {
                 Matcher matcher = ID_REGEX.matcher(sqle.getMessage());
                 String test;
-                if (matcher.matches()) {
+                if (matcher.find()) {
                     test = matcher.group(1);
                 } else {
                     test = "pas de match";
@@ -158,7 +158,7 @@ public class PratiquerController {
             if (sqle != null && sqle.getErrorCode() == 1452) {
                 Matcher matcher = ID_REGEX.matcher(sqle.getMessage());
                 String test;
-                if (matcher.matches()) {
+                if (matcher.find()) {
                     test = matcher.group(1);
                 } else {
                     test = "pas de match";
