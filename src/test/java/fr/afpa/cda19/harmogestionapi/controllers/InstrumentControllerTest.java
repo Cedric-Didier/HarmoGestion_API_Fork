@@ -6,6 +6,7 @@ import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Owner;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.http.MediaType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,7 +35,8 @@ class InstrumentControllerTest {
     @Test
     @Epic("Test Unitaire du contrôleur des instruments")
     @Owner("Cédric DIDIER")
-    @Description("Test de l'endpoint GET /instruments")
+    @DisplayName("Test de l'endpoint GET /instruments")
+    @Description("Vérification du code retour de l'api lors de la récupération de la liste des instruments")
     void getInstrumentsTest() throws Exception {
         mockMvc.perform(get("/instruments")).andExpect(status().isOk());
     }
@@ -42,7 +44,7 @@ class InstrumentControllerTest {
     @Test
     @Epic("Test Unitaire du contrôleur des instruments")
     @Owner("Cédric DIDIER")
-    @Description("Test de l'endpoint GET /instrument/{id}")
+    @DisplayName("Test de l'endpoint GET /instrument/{id}")
     void getInstrumentTestKo() throws Exception {
         mockMvc.perform(get("/instrument/1")).andExpect(status().isNotFound());
     }
@@ -50,7 +52,7 @@ class InstrumentControllerTest {
     @Test
     @Epic("Test Unitaire du contrôleur des instruments")
     @Owner("Cédric DIDIER")
-    @Description("Test de l'endpoint DELETE /instrument/{id}")
+    @DisplayName("Test de l'endpoint DELETE /instrument/{id}")
     void deleteInstrumentTest() throws Exception {
         mockMvc.perform(delete("/instrument/1")).andExpect(status().isOk());
     }
@@ -58,7 +60,7 @@ class InstrumentControllerTest {
     @Test
     @Epic("Test Unitaire du contrôleur des instruments")
     @Owner("Cédric DIDIER")
-    @Description("Test de l'endpoint PUT /instrument/{id}")
+    @DisplayName("Test de l'endpoint PUT /instrument/{id}")
     void updateInstrumentTest() throws Exception {
         mockMvc.perform(
                 put("/instrument/1").contentType(MediaType.APPLICATION_JSON)
@@ -73,7 +75,7 @@ class InstrumentControllerTest {
             "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"})
     @Epic("Test Unitaire du contrôleur des instruments")
     @Owner("Cédric DIDIER")
-    @Description("Test de l'endpoint POST /instrument/{id} "
+    @DisplayName("Test de l'endpoint POST /instrument/{id} "
                  + "avec un libelle d'instrument incorrect")
     void createInstrumentTestKo(final String libelle) throws Exception {
         Allure.parameter("libelleInstrument", libelle);
@@ -89,7 +91,7 @@ class InstrumentControllerTest {
     @ValueSource(strings = {"tria", "clarinette"})
     @Epic("Test Unitaire du contrôleur des instruments")
     @Owner("Cédric DIDIER")
-    @Description("Test de l'endpoint POST /instrument/{id} "
+    @DisplayName("Test de l'endpoint POST /instrument/{id} "
                  + "avec un libelle d'instrument correct")
     void createInstrumentTestOk(String libelle) throws Exception {
         Allure.parameter("libelleInstrument", libelle);
