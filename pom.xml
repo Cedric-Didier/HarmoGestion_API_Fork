@@ -29,6 +29,7 @@
 	<properties>
 		<java.version>25</java.version>
         <sonar.organization>cedric-didier</sonar.organization>
+        <allure.version>2.24.0</allure.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -72,6 +73,13 @@
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit5</artifactId>
             <version>2.34.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-bom</artifactId>
+            <version>${allure.version}</version>
+            <type>pom</type>
             <scope>test</scope>
         </dependency>
 	</dependencies>
@@ -130,7 +138,7 @@
                 <artifactId>allure-maven</artifactId>
                 <version>2.17.0</version>
                 <configuration>
-                    <reportVersion>2.24.0</reportVersion>
+                    <reportVersion>${allure.version}</reportVersion>
                     <resultsDirectory>${project.basedir}/allure-results</resultsDirectory>
                 </configuration>
                 <executions>
