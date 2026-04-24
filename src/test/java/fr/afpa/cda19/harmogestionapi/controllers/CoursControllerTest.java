@@ -4,6 +4,9 @@ import fr.afpa.cda19.harmogestionapi.models.Cours;
 import fr.afpa.cda19.harmogestionapi.models.Instrument;
 import fr.afpa.cda19.harmogestionapi.models.Membre;
 import fr.afpa.cda19.harmogestionapi.services.CoursService;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Owner;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -48,18 +51,27 @@ class CoursControllerTest {
 
 
     @Test
+    @Epic("Test Unitaire du contrôleur des cours")
+    @Owner("Thomas Seiwert")
+    @Description("Test de l'endpoint GET /cours")
     void getAllCoursTest() throws Exception {
 
         mockMvc.perform(get("/cours")).andExpect(status().isOk());
     }
 
     @Test
+    @Epic("Test Unitaire du contrôleur des cours")
+    @Owner("Thomas Seiwert")
+    @Description("Test de l'endpoint GET /cours/{id}")
     void getCoursTest() throws Exception {
 
         mockMvc.perform(get("/cours/1")).andExpect(status().isOk());
     }
 
     @Test
+    @Epic("Test Unitaire du contrôleur des cours")
+    @Owner("Thomas Seiwert")
+    @Description("Test de l'endpoint POST /cours. Avec un cours sans identifiant")
     void createCoursTestOk() throws Exception {
 
         cours.getParticipants().add(new Membre(2, "Hendrix",
@@ -73,6 +85,9 @@ class CoursControllerTest {
     }
 
     @Test
+    @Epic("Test Unitaire du contrôleur des cours")
+    @Owner("Thomas Seiwert")
+    @Description("Test de l'endpoint POST /cours. Avec un cours avec identifiant")
     void createCoursTestKo() throws Exception {
 
         cours.setIdCours(1);
@@ -85,6 +100,9 @@ class CoursControllerTest {
     }
 
     @Test
+    @Epic("Test Unitaire du contrôleur des cours")
+    @Owner("Thomas Seiwert")
+    @Description("Test de l'endpoint PUT /cours/{id}")
     void updateCoursTest() throws Exception {
 
         final String json = new ObjectMapper().writeValueAsString(cours);
@@ -96,6 +114,9 @@ class CoursControllerTest {
     }
 
     @Test
+    @Epic("Test Unitaire du contrôleur des cours")
+    @Owner("Thomas Seiwert")
+    @Description("Test de l'endpoint DELETE /cours/{id}")
     void deleteCoursTest() throws Exception {
 
         final String json = new ObjectMapper().writeValueAsString(cours);

@@ -76,8 +76,16 @@ jobs:
                   HARMOGESTION_CI_DB_DRIVER: com.mysql.cj.jdbc.Driver
                   HARMOGESTION_CI_DB_DIALECT: org.hibernate.dialect.MySQLDialect
               run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Cedric-Didier_HarmoGestion_API_Fork -Dspring.profiles.active=ci
+            - name: Deploy Allure Report
+              if: always()
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                  github_token: ${{secrets.PERSONAL_TOKEN_ALLURE}}
+                  publish_dir: ${{ github.workspace }}/target/site/allure-maven-plugin
+                  destination_dir: allure-report
+                  keep_files: false
             - name: Charging artifact
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@v4
               with:
                 name: harmogestionAPI-jar
                 path: target/*.jar
@@ -96,7 +104,7 @@ jobs:
                   username: ${{secrets.DOCKERHUB_USER}}
                   password: ${{secrets.DOCKERHUB_PASSWORD}}
             - name: Download artifact
-              uses: actions/download-artifact@v8
+              uses: actions/download-artifact@v4
               with:
                   name: harmogestionAPI-jar
             - name: List files in repo
