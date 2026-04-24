@@ -81,7 +81,7 @@ jobs:
               uses: peaceiris/actions-gh-pages@v4
               with:
                   github_token: ${{secrets.PERSONAL_TOKEN_ALLURE}}
-                  publish_dir: target/site/allure-maven-plugin
+                  publish_dir: ${{ github.workspace }}/target/site/allure-maven-plugin
                   destination_dir: allure-report
                   keep_files: false
             - name: Charging artifact
