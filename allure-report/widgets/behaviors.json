@@ -1,0 +1,1 @@
+{"total":3,"items":[{"uid":"c58d95d79d215cdc0adaf89903d9e612","name":"Test Unitaire du contrôleur des instruments","statistic":{"failed":0,"broken":0,"skipped":0,"passed":11,"unknown":0,"total":11}},{"uid":"440f1c05b44377c4eae1b84d152d1ead","name":"Test Unitaire du contrôleur des cours","statistic":{"failed":0,"broken":0,"skipped":0,"passed":6,"unknown":0,"total":6}}]}
