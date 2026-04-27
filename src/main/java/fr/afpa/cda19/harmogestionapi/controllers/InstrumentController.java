@@ -2,6 +2,11 @@ package fr.afpa.cda19.harmogestionapi.controllers;
 
 import fr.afpa.cda19.harmogestionapi.models.Instrument;
 import fr.afpa.cda19.harmogestionapi.services.InstrumentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,6 +33,7 @@ import java.util.Optional;
  * @since 08/04/2026
  */
 @RestController
+@Tag(name = "Instruments", description = "Gestion des instruments")
 public class InstrumentController {
 
     /**
@@ -51,6 +57,9 @@ public class InstrumentController {
      * @return la liste récupérée
      */
     @GetMapping("/instruments")
+    @Operation(summary = "Lister les instruments",
+               description = "Retourne tous les instruments")
+    @ApiResponse(responseCode = "200", description = "Succès")
     public Iterable<Instrument> getInstruments() {
         return service.getInstruments();
     }
@@ -64,9 +73,26 @@ public class InstrumentController {
      * ou un message d'erreur avec un code 400 ou 500
      */
     @PostMapping("/instrument")
+    @Operation(summary = "Création d'un instrument",
+               description = "Tente d'ajouter un instrument")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201",
+                         description = "Instrument créé"),
+            @ApiResponse(responseCode = "400",
+                         description = "L'instrument fourni a déjà un identifiant"),
+            @ApiResponse(responseCode = "400",
+                         description = "Le libellé de l'instrument fourni est incorrect"),
+            @ApiResponse(responseCode = "400",
+                         description = "L'instrument existe déjà"),
+            @ApiResponse(responseCode = "500",
+                         description = "Internal Server Error")
+    })
     public ResponseEntity<Instrument> createInstrument(
             @RequestBody
             @Valid
+            @Parameter(name = "instrument", required = true,
+                       description = "l'instrument à enregistrer",
+                       example = "{\"libelleInstrument\":\"Harpe\"}")
             final Instrument instrument, final BindingResult result) {
         Instrument errorResult = new Instrument();
         if (instrument.getIdInstrument() != null) {
@@ -110,8 +136,18 @@ public class InstrumentController {
      * ou message d'erreur avec un code 404
      */
     @GetMapping("/instrument/{id}")
+    @Operation(summary = "Récupération d'un instrument par son id",
+               description = "Récupération d'un instrument par son id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                         description = "l'instrument a été trouvé"),
+            @ApiResponse(responseCode = "404",
+                         description = "la ressource n'est pas disponible")
+    })
     public ResponseEntity<Instrument> getInstrument(
             @PathVariable
+            @Parameter(name = "id", description = "identifiant de l'instrument",
+                       required = true, example = "1")
             final int id) {
         Optional<Instrument> instrument = service.getInstrument(id);
         if (instrument.isEmpty()) {
