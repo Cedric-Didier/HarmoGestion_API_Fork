@@ -84,7 +84,7 @@ public class Cours {
             inverseJoinColumns = @JoinColumn(name = "id_membre_apprenant")
     )
     @NotNull(message = "Le cours doit avoir des participants")
-    @Size(min = 1, max = 15, message = "Le nombre de participants doit être "
-                                       + "entre 1 et 15")
+    @Size(max = 15, message = "Le nombre de participants doit être "
+                              + "de 15 au maximum")
     private List<Membre> participants;
 }
