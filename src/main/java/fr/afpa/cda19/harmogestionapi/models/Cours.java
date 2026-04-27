@@ -79,7 +79,7 @@ public class Cours {
      */
     @ManyToMany
     @JoinTable(
-            name = "Participer_Cours",
+            name = "participer_cours",
             joinColumns = @JoinColumn(name = "id_cours"),
             inverseJoinColumns = @JoinColumn(name = "id_membre_apprenant")
     )
