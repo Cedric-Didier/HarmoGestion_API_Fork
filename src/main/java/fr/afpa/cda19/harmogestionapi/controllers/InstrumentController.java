@@ -4,8 +4,9 @@ import fr.afpa.cda19.harmogestionapi.models.Instrument;
 import fr.afpa.cda19.harmogestionapi.services.InstrumentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.SQLException;
@@ -57,9 +57,34 @@ public class InstrumentController {
      * @return la liste récupérée
      */
     @GetMapping("/instruments")
-    @Operation(summary = "Lister les instruments",
-               description = "Retourne tous les instruments")
-    @ApiResponse(responseCode = "200", description = "Succès")
+    @Operation(
+            summary = "Lister les instruments",
+            responses = @ApiResponse(
+                    responseCode = "200",
+                    description = "Ok",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                            [
+                                              {
+                                               "idInstrument":1,
+                                               "libelleInstrument":"Harpe"
+                                              },
+                                              {
+                                               "idInstrument":2,
+                                               "libelleInstrument":"Triangle"
+                                              },
+                                              {
+                                               "idInstrument":3,
+                                               "libelleInstrument":"Violon"
+                                              }
+                                            ]
+                                            """
+                            )
+                    )
+            )
+    )
     public Iterable<Instrument> getInstruments() {
         return service.getInstruments();
     }
@@ -73,26 +98,73 @@ public class InstrumentController {
      * ou un message d'erreur avec un code 400 ou 500
      */
     @PostMapping("/instrument")
-    @Operation(summary = "Création d'un instrument",
-               description = "Tente d'ajouter un instrument")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201",
-                         description = "Instrument créé"),
-            @ApiResponse(responseCode = "400",
-                         description = "L'instrument fourni a déjà un identifiant"),
-            @ApiResponse(responseCode = "400",
-                         description = "Le libellé de l'instrument fourni est incorrect"),
-            @ApiResponse(responseCode = "400",
-                         description = "L'instrument existe déjà"),
-            @ApiResponse(responseCode = "500",
-                         description = "Internal Server Error")
-    })
+    @Operation(
+            summary = "Création d'un instrument",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "l'instrument à enregistrer",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                             "libelleInstrument":"Harpe"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Created",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = """
+                                                    {
+                                                      "idInstrument":15,
+                                                      "libelleInstrument":"Harpe"
+                                                    }
+                                                    """
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad Request",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = """
+                                                    {
+                                                      "idInstrument":null,
+                                                      "libelleInstrument":"string"
+                                                    }
+                                                    """
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal Server Error",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = """
+                                                    {
+                                                      "idInstrument":null,
+                                                      "libelleInstrument":"string"
+                                                    }
+                                                    """
+                                    )
+                            )
+                    )
+            }
+    )
     public ResponseEntity<Instrument> createInstrument(
-            @RequestBody
+            @org.springframework.web.bind.annotation.RequestBody
             @Valid
-            @Parameter(name = "instrument", required = true,
-                       description = "l'instrument à enregistrer",
-                       example = "{\"libelleInstrument\":\"Harpe\"}")
             final Instrument instrument, final BindingResult result) {
         Instrument errorResult = new Instrument();
         if (instrument.getIdInstrument() != null) {
@@ -136,18 +208,49 @@ public class InstrumentController {
      * ou message d'erreur avec un code 404
      */
     @GetMapping("/instrument/{id}")
-    @Operation(summary = "Récupération d'un instrument par son id",
-               description = "Récupération d'un instrument par son id")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",
-                         description = "l'instrument a été trouvé"),
-            @ApiResponse(responseCode = "404",
-                         description = "la ressource n'est pas disponible")
-    })
+    @Operation(
+            summary = "Récupération d'un instrument par son id",
+            parameters = @Parameter(
+                    name = "id",
+                    description = "identifiant de l'instrument",
+                    required = true,
+                    example = "1"
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Ok",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = """
+                                                    {
+                                                      "idInstrument":1,
+                                                      "libelleInstrument":"Harpe"
+                                                    }
+                                                    """
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = """
+                                                    {
+                                                      "idInstrument":null,
+                                                      "libelleInstrument":"string"
+                                                    }
+                                                    """
+                                    )
+                            )
+                    )
+            }
+    )
     public ResponseEntity<Instrument> getInstrument(
             @PathVariable
-            @Parameter(name = "id", description = "identifiant de l'instrument",
-                       required = true, example = "1")
             final int id) {
         Optional<Instrument> instrument = service.getInstrument(id);
         if (instrument.isEmpty()) {
@@ -176,10 +279,96 @@ public class InstrumentController {
      * ou un message d'erreur avec un code 400 ou 500
      */
     @PutMapping("/instrument/{id}")
+    @Operation(
+            summary = "Modification d'un instrument",
+            parameters = @Parameter(
+                    name = "id",
+                    description = "identifiant de l'instrument",
+                    required = true,
+                    example = "1"
+            ),
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "l'instrument à enregistrer",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "idInstrument":1,
+                                              "libelleInstrument":"Harpe"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Ok",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = """
+                                                    {
+                                                      "idInstrument":1,
+                                                      "libelleInstrument":"Harpe"
+                                                    }
+                                                    """
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad Request",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = """
+                                                    {
+                                                      "idInstrument":null,
+                                                      "libelleInstrument":"string"
+                                                    }
+                                                    """
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = """
+                                                    {
+                                                      "idInstrument":null,
+                                                      "libelleInstrument":"string"
+                                                    }
+                                                    """
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal Server Error",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = """
+                                                    {
+                                                      "idInstrument":null,
+                                                      "libelleInstrument":"string"
+                                                    }
+                                                    """
+                                    )
+                            )
+                    )
+            }
+    )
     public ResponseEntity<Instrument> updateInstrument(
             @PathVariable
             final int id,
-            @RequestBody
+            @org.springframework.web.bind.annotation.RequestBody
             @Valid
             final Instrument instrument, final BindingResult result) {
         /*
@@ -247,6 +436,15 @@ public class InstrumentController {
      * @param id l'identifiant de l'instrument à supprimer
      */
     @DeleteMapping("/instrument/{id}")
+    @Operation(
+            summary = "Suppression d'un instrument par son identifiant.",
+            parameters = @Parameter(
+                    name = "id",
+                    description = "identifiant de l'instrument",
+                    required = true,
+                    example = "1"
+            )
+    )
     public void deleteInstrument(
             @PathVariable
             final int id) {
