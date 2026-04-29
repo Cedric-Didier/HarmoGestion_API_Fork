@@ -274,10 +274,11 @@ public class MembreController {
                 currentMembre.getPrenomMembre()) != 0) {
             currentMembre.setPrenomMembre(prenomMembre);
         }
-        if (dateInscriptionMembre != null && dateInscriptionMembre.compareTo(
-                currentMembre.getDateInscriptionMembre()) != 0) {
+        if (dateInscriptionMembre != null &&
+            !dateInscriptionMembre.isEqual(currentMembre.getDateInscriptionMembre())) {
             currentMembre.setDateInscriptionMembre(dateInscriptionMembre);
         }
+        currentMembre.setPratiques(membre.getPratiques());
         try {
             service.saveMembre(currentMembre);
         } catch (DataIntegrityViolationException _) {

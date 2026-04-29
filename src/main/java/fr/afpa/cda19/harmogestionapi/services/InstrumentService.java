@@ -2,6 +2,8 @@ package fr.afpa.cda19.harmogestionapi.services;
 
 import fr.afpa.cda19.harmogestionapi.models.Instrument;
 import fr.afpa.cda19.harmogestionapi.repositories.InstrumentRepository;
+import fr.afpa.cda19.harmogestionapi.repositories.PratiquerRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
@@ -20,11 +22,24 @@ public class InstrumentService {
     /**
      * Repository des instruments
      */
-    private final InstrumentRepository repository;
+    private final InstrumentRepository instrumentRepository;
 
+    /**
+     * Repository de la pratique des instruments
+     */
+    private final PratiquerRepository pratiquerRepository;
+
+    /**
+     * Initialisation du service des instruments.
+     *
+     * @param instrumentRepository repository des instruments
+     * @param pratiquerRepository  repository de l'entité Pratiquer
+     */
     @Autowired
-    public InstrumentService(InstrumentRepository repository) {
-        this.repository = repository;
+    public InstrumentService(final InstrumentRepository instrumentRepository,
+                             final PratiquerRepository pratiquerRepository) {
+        this.instrumentRepository = instrumentRepository;
+        this.pratiquerRepository = pratiquerRepository;
     }
 
     /**
@@ -35,7 +50,7 @@ public class InstrumentService {
      * l'identifiant
      */
     public Optional<Instrument> getInstrument(int id) {
-        return repository.findById(id);
+        return instrumentRepository.findById(id);
     }
 
     /**
@@ -44,7 +59,7 @@ public class InstrumentService {
      * @return la liste des instruments
      */
     public Iterable<Instrument> getInstruments() {
-        return repository.findAll();
+        return instrumentRepository.findAll();
     }
 
     /**
@@ -52,8 +67,10 @@ public class InstrumentService {
      *
      * @param id l'identifiant de l'instrument à supprimer
      */
+    @Transactional
     public void deleteInstrument(int id) {
-        repository.deleteById(id);
+        pratiquerRepository.deleteAllByIdInstrument(id);
+        instrumentRepository.deleteById(id);
     }
 
     /**
@@ -62,7 +79,8 @@ public class InstrumentService {
      * @param instrument l'instrument à créer ou modifier
      * @return l'instrument après création ou modification
      */
+    @Transactional
     public Instrument saveInstrument(Instrument instrument) {
-        return repository.save(instrument);
+        return instrumentRepository.save(instrument);
     }
 }

@@ -2,65 +2,84 @@ package fr.afpa.cda19.harmogestionapi.services;
 
 import fr.afpa.cda19.harmogestionapi.repositories.MembreRepository;
 import fr.afpa.cda19.harmogestionapi.models.Membre;
+import fr.afpa.cda19.harmogestionapi.repositories.PratiquerRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 
 /**
  * Service de liaison entre les contrôleurs et le repository
  * {@link MembreRepository}.
+ *
  * @author Rodolphe BRUCKER
  * @version 1.0.0
  * @since 09/04/2026
  */
 @Service
 public class MembreService {
-    //==== Variables ====
+
     /**
      * Service de liaison avec le repository des instruments.
      */
-    private final MembreRepository repository;
+    private final MembreRepository membreRepository;
+
+    /**
+     * Repository de la pratique des instruments
+     */
+    private final PratiquerRepository pratiquerRepository;
 
     /**
      * Constructeur.
-     * @param repository Repository des membres.
+     *
+     * @param membreRepository Repository des membres.
      */
     @Autowired
-    public MembreService(MembreRepository repository) {
-        this.repository = repository;
+    public MembreService(final MembreRepository membreRepository,
+                         final PratiquerRepository pratiquerRepository) {
+        this.membreRepository = membreRepository;
+        this.pratiquerRepository = pratiquerRepository;
     }
 
     /**
      * Récupèration d'un membre par son identifiant.
+     *
      * @param id l'identifiant du membre recherché
      * @return ({@link Optional}) Éventuel membre correspondant à l'identifiant.
      */
     public Optional<Membre> getMembre(int id) {
-        return repository.findById(id);
+        return membreRepository.findById(id);
     }
 
     /**
      * Récupèration de la liste des membres.
+     *
      * @return Liste des membres.
      */
     public Iterable<Membre> getMembres() {
-        return repository.findAll();
+        return membreRepository.findAll();
     }
 
     /**
      * Suppression d'un membre par son identifiant.
+     *
      * @param id Identifiant du membre à supprimer.
      */
+    @Transactional
     public void deleteMembre(int id) {
-        repository.deleteById(id);
+        pratiquerRepository.deleteAllByIdMembre(id);
+        membreRepository.deleteById(id);
     }
 
     /**
      * Enregistrement ou modification d'un membre.
+     *
      * @param membre Membre à créer ou modifier.
      * @return Membre après création ou modification.
      */
+    @Transactional
     public Membre saveMembre(Membre membre) {
-        return repository.save(membre);
+        return membreRepository.save(membre);
     }
 }

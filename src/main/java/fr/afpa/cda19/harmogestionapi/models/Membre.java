@@ -1,10 +1,12 @@
 package fr.afpa.cda19.harmogestionapi.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Classe représentant un membre.
@@ -28,6 +31,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Table(name = "membre")
 public class Membre {
+
     /**
      * Identifiant du membre.
      */
@@ -63,4 +67,8 @@ public class Membre {
     @NotNull(message = "Un membre doit avoir une date d'inscription.")
     @PastOrPresent(message = "Une date d'inscription ne peut pas être future.")
     private LocalDate dateInscriptionMembre;
+
+    @OneToMany(mappedBy = "membre")
+    @JsonManagedReference
+    private List<Pratiquer> pratiques;
 }
