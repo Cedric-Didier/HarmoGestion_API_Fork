@@ -36,16 +36,23 @@ class CoursControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final Cours cours =
-            new Cours(null, LocalDateTime.now(), (byte) 45,
-                      new Membre(1, "Seiwert",
-                                 "Thomas", LocalDate.now()),
-                      new Instrument(1, "guitare"),
-                      new ArrayList<>());
+    private final Cours cours;
 
 
     @MockitoBean
     private CoursService coursService;
+
+    public CoursControllerTest() {
+        Membre membre = new Membre();
+        membre.setIdMembre(1);
+        membre.setNomMembre("Seiwert");
+        membre.setPrenomMembre("Thomas");
+        membre.setDateInscriptionMembre(LocalDate.now());
+        cours = new Cours(null, LocalDateTime.now(), (byte) 45,
+                          membre,
+                          new Instrument(1, "guitare"),
+                          new ArrayList<>());
+    }
 
 
     @Test
@@ -71,9 +78,12 @@ class CoursControllerTest {
     @Owner("Thomas Seiwert")
     @Description("Test de l'endpoint POST /cours. Avec un cours sans identifiant")
     void createCoursTestOk() throws Exception {
-
-        cours.getParticipants().add(new Membre(2, "Hendrix",
-                                               "Jimmi", LocalDate.now()));
+        Membre membre = new Membre();
+        membre.setIdMembre(2);
+        membre.setNomMembre("Hendrix");
+        membre.setPrenomMembre("Jimmi");
+        membre.setDateInscriptionMembre(LocalDate.now());
+        cours.getParticipants().add(membre);
         final String json = new ObjectMapper().writeValueAsString(cours);
 
         mockMvc.perform(post("/cours")
