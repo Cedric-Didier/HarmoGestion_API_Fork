@@ -36,7 +36,8 @@ class InstrumentControllerTest {
     @Epic("Test Unitaire du contrôleur des instruments")
     @Owner("Cédric DIDIER")
     @DisplayName("Test de l'endpoint GET /instruments")
-    @Description("Vérification du code retour de l'api lors de la récupération de la liste des instruments")
+    @Description(
+            "Vérification du code retour de l'api lors de la récupération de la liste des instruments")
     void getInstrumentsTest() throws Exception {
         mockMvc.perform(get("/instruments")).andExpect(status().isOk());
     }

@@ -10,11 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class HarmoGestionApiApplicationTests {
 
-	@Test
+    @Test
     @DisplayName("Test chargement du context spring boot")
     @Severity(SeverityLevel.CRITICAL)
     @Owner("Cédric DIDIER")
-	void contextLoads() {
-	}
+    void contextLoads() {
+    }
 
 }

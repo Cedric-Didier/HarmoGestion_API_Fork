@@ -17,7 +17,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -79,7 +78,7 @@ public class Cours {
      */
     @ManyToMany
     @JoinTable(
-            name = "Participer_Cours",
+            name = "participer_cours",
             joinColumns = @JoinColumn(name = "id_cours"),
             inverseJoinColumns = @JoinColumn(name = "id_membre_apprenant")
     )
