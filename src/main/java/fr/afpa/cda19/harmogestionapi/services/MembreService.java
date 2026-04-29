@@ -23,7 +23,7 @@ public class MembreService {
     /**
      * Service de liaison avec le repository des instruments.
      */
-    private final MembreRepository repository;
+    private final MembreRepository membreRepository;
 
     /**
      * Repository de la pratique des instruments
@@ -33,12 +33,12 @@ public class MembreService {
     /**
      * Constructeur.
      *
-     * @param repository Repository des membres.
+     * @param membreRepository Repository des membres.
      */
     @Autowired
-    public MembreService(final MembreRepository repository,
+    public MembreService(final MembreRepository membreRepository,
                          final PratiquerRepository pratiquerRepository) {
-        this.repository = repository;
+        this.membreRepository = membreRepository;
         this.pratiquerRepository = pratiquerRepository;
     }
 
@@ -49,7 +49,7 @@ public class MembreService {
      * @return ({@link Optional}) Éventuel membre correspondant à l'identifiant.
      */
     public Optional<Membre> getMembre(int id) {
-        return repository.findById(id);
+        return membreRepository.findById(id);
     }
 
     /**
@@ -58,7 +58,7 @@ public class MembreService {
      * @return Liste des membres.
      */
     public Iterable<Membre> getMembres() {
-        return repository.findAll();
+        return membreRepository.findAll();
     }
 
     /**
@@ -69,7 +69,7 @@ public class MembreService {
     @Transactional
     public void deleteMembre(int id) {
         pratiquerRepository.deleteAllByIdMembre(id);
-        repository.deleteById(id);
+        membreRepository.deleteById(id);
     }
 
     /**
@@ -80,6 +80,6 @@ public class MembreService {
      */
     @Transactional
     public Membre saveMembre(Membre membre) {
-        return repository.save(membre);
+        return membreRepository.save(membre);
     }
 }
