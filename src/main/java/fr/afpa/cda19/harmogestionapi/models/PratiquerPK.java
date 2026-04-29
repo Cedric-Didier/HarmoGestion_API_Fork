@@ -1,5 +1,6 @@
 package fr.afpa.cda19.harmogestionapi.models;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,10 +24,12 @@ public class PratiquerPK implements Serializable {
     /**
      * Identifiant de l'instrument.
      */
+    @Column(name = "id_instrument")
     private Integer idInstrument;
 
     /**
      * Identifiant du membre.
      */
+    @Column(name = "id_membre")
     private Integer idMembre;
 }
