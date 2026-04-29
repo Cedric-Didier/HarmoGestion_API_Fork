@@ -3,6 +3,10 @@ package fr.afpa.cda19.harmogestionapi.controllers;
 import fr.afpa.cda19.harmogestionapi.models.Cours;
 import fr.afpa.cda19.harmogestionapi.models.Membre;
 import fr.afpa.cda19.harmogestionapi.services.CoursService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,9 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.Optional;
 
 /**
@@ -28,6 +30,7 @@ import java.util.Optional;
  * @since 07/04/2026
  */
 @RestController
+@Tag(name = "Cours", description = "Gestion des cours")
 public class CoursController {
 
     /**
@@ -43,7 +46,6 @@ public class CoursController {
      */
     @Autowired
     public CoursController(final CoursService coursService) {
-
         this.coursService = coursService;
     }
 
@@ -54,8 +56,15 @@ public class CoursController {
      * @return Iterable{Cours} : liste des cours
      */
     @GetMapping("/cours")
+    @Operation(
+            summary = "Liste des cours",
+            responses = @ApiResponse(
+                    responseCode = "200",
+                    description = "Ok",
+                    useReturnTypeSchema = true
+            )
+    )
     public Iterable<Cours> getAllCours() {
-
         return coursService.getAllCours();
     }
 
@@ -67,10 +76,23 @@ public class CoursController {
      * @return Cours : le cours correspondant à l'id (null si inexistant)
      */
     @GetMapping("/cours/{id}")
+    @Operation(
+            summary = "Récupèration d'un cours par son identifiant",
+            parameters = @Parameter(
+                    name = "id",
+                    description = "identifiant du cours",
+                    required = true,
+                    example = "1"
+            ),
+            responses = @ApiResponse(
+                    responseCode = "200",
+                    description = "Ok",
+                    useReturnTypeSchema = true
+            )
+    )
     public Cours getCours(
             @PathVariable
             final int id) {
-
         Optional<Cours> cours = coursService.getCours(id);
         return cours.orElse(null);
     }
@@ -84,11 +106,35 @@ public class CoursController {
      * ou un statut 400 ou 500 pour une erreur.
      */
     @PostMapping("/cours")
+    @Operation(
+            summary = "Création d'un cours",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "Le cours à enregistrer",
+                    useParameterTypeSchema = true
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Created",
+                            useReturnTypeSchema = true
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad Request",
+                            useReturnTypeSchema = true
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal Server Error",
+                            useReturnTypeSchema = true
+                    )
+            }
+    )
     public ResponseEntity<Object> createCours(
-            @RequestBody
+            @org.springframework.web.bind.annotation.RequestBody
             @Valid
             final Cours cours, final BindingResult result) {
-
         if (cours.getIdCours() != null || result.hasErrors() ||
             cours.getEnseignant().getIdMembre() == null ||
             cours.getInstrument().getIdInstrument() == null) {
@@ -124,13 +170,48 @@ public class CoursController {
      * ou un statut 400 ou 500 pour une erreur.
      */
     @PutMapping("/cours/{id}")
+    @Operation(
+            summary = "Modification d'un cours",
+            parameters = @Parameter(
+                    name = "id",
+                    description = "identifiant du cours",
+                    required = true,
+                    example = "1"
+            ),
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "Le cours à enregistrer",
+                    useParameterTypeSchema = true
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Ok",
+                            useReturnTypeSchema = true
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad Request",
+                            useReturnTypeSchema = true
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found",
+                            useReturnTypeSchema = true
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal Server Error",
+                            useReturnTypeSchema = true
+                    )
+            }
+    )
     public ResponseEntity<Object> updateCours(
             @PathVariable
             final int id,
             @Valid
-            @RequestBody
+            @org.springframework.web.bind.annotation.RequestBody
             final Cours cours, final BindingResult result) {
-
         Optional<Cours> optionalInstrument = coursService.getCours(id);
         if (optionalInstrument.isEmpty()) {
             // Aucun cours n'a l'identifiant donné dans l'URL.
@@ -169,10 +250,18 @@ public class CoursController {
      * @param id int : identifiant du cours à supprimer.
      */
     @DeleteMapping("/cours/{id}")
+    @Operation(
+            summary = "Suppression d'un cours par son identifiant",
+            parameters = @Parameter(
+                    name = "id",
+                    description = "identifiant du cours",
+                    required = true,
+                    example = "1"
+            )
+    )
     public void deleteCours(
             @PathVariable
             final int id) {
-
         coursService.deleteCours(id);
     }
 }

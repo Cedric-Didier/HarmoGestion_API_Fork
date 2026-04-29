@@ -2,6 +2,10 @@ package fr.afpa.cda19.harmogestionapi.controllers;
 
 import fr.afpa.cda19.harmogestionapi.models.Membre;
 import fr.afpa.cda19.harmogestionapi.services.MembreService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,21 +26,26 @@ import java.util.Optional;
 
 /**
  * Contrôleur de gestion des requêtes concernant les membres.
+ *
  * @author Rodolphe BRUCKER
  * @version 1.0.0
  * @since 10/04/2026
  */
 @RestController
+@Tag(name = "Membres", description = "Gestion des membres")
 public class MembreController {
     //==== Variables ====
+
     /**
      * Service de liaison avec le repository des membres.
      */
     private final MembreService service;
 
     //==== Constructeurs ====
+
     /**
      * Constructeur d'initialisation du contrôleur.
+     *
      * @param service Sevice de liaison avec le repository des membres.
      */
     @Autowired
@@ -45,23 +54,59 @@ public class MembreController {
     }
 
     //==== Méthodes ====
+
     /**
      * Endpoint de récupèration de la liste des membres.
+     *
      * @return la liste récupérée
      */
     @GetMapping("/membres")
+    @Operation(
+            summary = "Liste des membres",
+            responses = @ApiResponse(
+                    responseCode = "200",
+                    description = "Ok",
+                    useReturnTypeSchema = true
+            )
+    )
     public Iterable<Membre> getMembres() {
         return service.getMembres();
     }
 
     /**
      * Endpoint de création d'un nouveau membre.
+     *
      * @param membre Membre à créer.
-     * @param result     Résultat de la validation du membre.
+     * @param result Résultat de la validation du membre.
      * @return La response contenant le membre créé avec un code 201
      * ou un message d'erreur avec un code 400 ou 500.
      */
     @PostMapping("/membre")
+    @Operation(
+            summary = "Création d'un membre",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "Le membre à enregistrer",
+                    useParameterTypeSchema = true
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Created",
+                            useReturnTypeSchema = true
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad Request",
+                            useReturnTypeSchema = true
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal Server Error",
+                            useReturnTypeSchema = true
+                    )
+            }
+    )
     public ResponseEntity<Object> createMembre(
             @RequestBody
             @Valid
@@ -107,11 +152,26 @@ public class MembreController {
 
     /**
      * Endpoint de récupèration d'un membre par son identifiant.
+     *
      * @param id Identifiant du membre à récupérer.
      * @return Réponse contenant le membre correspondant avec un code 200
      * ou message d'erreur avec un code 404.
      */
     @GetMapping("/membre/{id}")
+    @Operation(
+            summary = "Récupèration d'un membre par son identifiant",
+            parameters = @Parameter(
+                    name = "id",
+                    description = "identifiant du membre",
+                    required = true,
+                    example = "1"
+            ),
+            responses = @ApiResponse(
+                    responseCode = "200",
+                    description = "Ok",
+                    useReturnTypeSchema = true
+            )
+    )
     public Optional<Membre> getMembre(
             @PathVariable
             final int id) {
@@ -120,13 +180,50 @@ public class MembreController {
 
     /**
      * Endpoint de mise à jour d'un membre.
-     * @param id Identifiant du membre à modifier
+     *
+     * @param id     Identifiant du membre à modifier
      * @param membre Membre modifié.
      * @param result Résultat de la validation du membre modifié.
      * @return Réponse contenant le membre modifié avec un code 200
      * ou un message d'erreur avec un code 400 ou 500
      */
     @PutMapping("/membre/{id}")
+    @Operation(
+            summary = "Modification d'un membre",
+            parameters = @Parameter(
+                    name = "id",
+                    description = "identifiant du membre",
+                    required = true,
+                    example = "1"
+            ),
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "Le membre à enregistrer",
+                    useParameterTypeSchema = true
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Ok",
+                            useReturnTypeSchema = true
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad Request",
+                            useReturnTypeSchema = true
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Not Found",
+                            useReturnTypeSchema = true
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal Server Error",
+                            useReturnTypeSchema = true
+                    )
+            }
+    )
     public ResponseEntity<Object> updateMembre(
             @PathVariable
             final int id,
@@ -193,9 +290,19 @@ public class MembreController {
 
     /**
      * Endpoint de suppression d'un membre.
+     *
      * @param id Identifiant du membre à supprimer
      */
     @DeleteMapping("/membre/{id}")
+    @Operation(
+            summary = "Suppression d'un membre par son identifiant",
+            parameters = @Parameter(
+                    name = "id",
+                    description = "identifiant du membre",
+                    required = true,
+                    example = "1"
+            )
+    )
     public void deleteMembre(
             @PathVariable
             final int id) {

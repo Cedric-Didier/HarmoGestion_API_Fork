@@ -5,7 +5,6 @@ import fr.afpa.cda19.harmogestionapi.repositories.CoursRepository;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 /**
@@ -32,7 +31,6 @@ public class CoursService {
      */
     @Autowired
     public CoursService(final CoursRepository coursRepository) {
-
         this.coursRepository = coursRepository;
     }
 
@@ -43,7 +41,6 @@ public class CoursService {
      * @return Iterable{Cours} : la liste des cours
      */
     public Iterable<Cours> getAllCours() {
-
         return coursRepository.findAll();
     }
 
@@ -54,7 +51,6 @@ public class CoursService {
      * @return Optional{Cours} : le cours correspondant à l'id (peut être null)
      */
     public Optional<Cours> getCours(final int id) {
-
         return coursRepository.findById(id);
     }
 
@@ -65,7 +61,6 @@ public class CoursService {
      * @return Cours : le cours créé/modifié
      */
     public Cours saveCours(final Cours cours) {
-
         return coursRepository.save(cours);
     }
 
@@ -75,7 +70,6 @@ public class CoursService {
      * @param id int : identifiant du cours à supprimer
      */
     public void deleteCours(final int id) {
-
         coursRepository.deleteById(id);
     }
 }
