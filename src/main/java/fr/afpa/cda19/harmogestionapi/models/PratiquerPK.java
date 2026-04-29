@@ -1,10 +1,10 @@
 package fr.afpa.cda19.harmogestionapi.models;
 
 import jakarta.persistence.Embeddable;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.io.Serializable;
 
 /**
  * Classe représentant l'identifiant de la pratique d'un instrument par un
@@ -18,17 +18,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
-public class PratiquerPK {
+public class PratiquerPK implements Serializable {
 
     /**
      * Identifiant de l'instrument.
      */
-    @NotNull(message = "l'identifiant de l'instrument est obligatoire.")
     private Integer idInstrument;
 
     /**
      * Identifiant du membre.
      */
-    @NotNull(message = "L'identifiant du membre est obligatoire.")
     private Integer idMembre;
 }

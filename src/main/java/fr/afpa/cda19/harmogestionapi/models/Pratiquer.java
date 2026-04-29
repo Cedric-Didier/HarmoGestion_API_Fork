@@ -1,9 +1,12 @@
 package fr.afpa.cda19.harmogestionapi.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -22,24 +25,30 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "pratiquer")
-@IdClass(PratiquerPK.class)
 public class Pratiquer {
+
+    @EmbeddedId
+    private PratiquerPK id;
 
     /**
      * Identifiant de l'instrument.
      */
-    @Id
-    @Column(name = "id_instrument")
+
+    @ManyToOne
+    @JoinColumn(name = "id_instrument")
+    @MapsId("idInstrument")
     @NotNull(message = "l'identifiant de l'instrument est obligatoire.")
-    private Integer idInstrument;
+    private Instrument instrument;
 
     /**
      * Identifiant du membre.
      */
-    @Id
-    @Column(name = "id_membre")
+    @ManyToOne
+    @MapsId("idMembre")
+    @JoinColumn(name = "id_membre")
+    @JsonBackReference
     @NotNull(message = "L'identifiant du membre est obligatoire.")
-    private Integer idMembre;
+    private Membre membre;
 
     /**
      * Booléen indiquant si la pratique de l'instrument par le membre est en
