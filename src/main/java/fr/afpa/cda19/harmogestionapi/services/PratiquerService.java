@@ -1,12 +1,13 @@
 package fr.afpa.cda19.harmogestionapi.services;
 
+import fr.afpa.cda19.harmogestionapi.models.Instrument;
+import fr.afpa.cda19.harmogestionapi.models.Membre;
 import fr.afpa.cda19.harmogestionapi.models.Pratiquer;
 import fr.afpa.cda19.harmogestionapi.models.PratiquerPK;
 import fr.afpa.cda19.harmogestionapi.repositories.PratiquerRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 /**
@@ -48,25 +49,24 @@ public class PratiquerService {
     /**
      * Récupèration de la liste des instruments pratiqués par un membre.
      *
-     * @param idMembre L'identifiant du membre dont on souhaite la liste
-     *                 des instruments pratiqués
+     * @param membre Le membre dont on souhaite la liste des instruments pratiqués
      * @return La liste des instruments pratiqués par le membre
      */
-    public Iterable<Pratiquer> getInstrumentsPratiquesByIdMembre(
-            final Integer idMembre) {
-        return repository.findByIdMembre(idMembre);
+    public Iterable<Pratiquer> getInstrumentsPratiquesByMembre(
+            final Membre membre) {
+        return repository.findByMembre(membre);
     }
 
     /**
      * Récupèration de la liste des membres pratiquant d'un instrument.
      *
-     * @param idInstrument l'identifiant de l'instrument dont on souhaite
+     * @param instrument l'identifiant de l'instrument dont on souhaite
      *                     connaitre les pratiquants
      * @return La liste des membres pratiquant de cet instrument
      */
-    public Iterable<Pratiquer> getMembresPratiquantsByIdInstrument(
-            final Integer idInstrument) {
-        return repository.findByIdInstrument(idInstrument);
+    public Iterable<Pratiquer> getMembresPratiquantsByInstrument(
+            final Instrument instrument) {
+        return repository.findByInstrument(instrument);
     }
 
     /**
