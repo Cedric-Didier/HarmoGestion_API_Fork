@@ -1,5 +1,9 @@
 package fr.afpa.cda19.harmogestionapi.controllers;
 
+import fr.afpa.cda19.harmogestionapi.dtos.request.InstrumentCreateRequestDTO;
+import fr.afpa.cda19.harmogestionapi.dtos.response.InstrumentResponseDTO;
+import fr.afpa.cda19.harmogestionapi.exceptions.RessourceDupliqueeException;
+import fr.afpa.cda19.harmogestionapi.exceptions.RessourceNonTrouveException;
 import fr.afpa.cda19.harmogestionapi.models.Instrument;
 import fr.afpa.cda19.harmogestionapi.services.InstrumentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,7 +13,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -32,6 +37,7 @@ import java.util.Optional;
  * @since 08/04/2026
  */
 @RestController
+@RequiredArgsConstructor
 @Tag(name = "Instruments", description = "Gestion des instruments")
 public class InstrumentController {
 
@@ -39,16 +45,6 @@ public class InstrumentController {
      * Service de liaison avec le repository des instruments.
      */
     private final InstrumentService service;
-
-    /**
-     * Constructeur d'initialisation du contrôleur.
-     *
-     * @param service service de liaison avec le repository des instruments
-     */
-    @Autowired
-    public InstrumentController(final InstrumentService service) {
-        this.service = service;
-    }
 
     /**
      * Endpoint de récupèration de la liste des instruments.
@@ -67,16 +63,8 @@ public class InstrumentController {
                                     value = """
                                             [
                                               {
-                                               "idInstrument":1,
-                                               "libelleInstrument":"Harpe"
-                                              },
-                                              {
-                                               "idInstrument":2,
-                                               "libelleInstrument":"Triangle"
-                                              },
-                                              {
-                                               "idInstrument":3,
-                                               "libelleInstrument":"Violon"
+                                               "id":1,
+                                               "nom":"Harpe"
                                               }
                                             ]
                                             """
@@ -84,7 +72,7 @@ public class InstrumentController {
                     )
             )
     )
-    public Iterable<Instrument> getInstruments() {
+    public List<InstrumentResponseDTO> getInstruments() {
         return service.getInstruments();
     }
 
@@ -92,9 +80,7 @@ public class InstrumentController {
      * Endpoint de création d'un nouvel instrument.
      *
      * @param instrument l'instrument à créer
-     * @param result     le résultat de la validation de l'instrument
      * @return la response contenant l'instrument créé avec un code 201
-     * ou un message d'erreur avec un code 400 ou 500
      */
     @PostMapping("/instrument")
     @Operation(
@@ -161,42 +147,13 @@ public class InstrumentController {
                     )
             }
     )
-    public ResponseEntity<Instrument> createInstrument(
+    public ResponseEntity<InstrumentResponseDTO> createInstrument(
             @org.springframework.web.bind.annotation.RequestBody
             @Valid
-            final Instrument instrument, final BindingResult result) {
-        Instrument errorResult = new Instrument();
-        if (instrument.getIdInstrument() != null) {
-            // L'instrument dans la requête ne doit pas avoir d'identifiant
-            errorResult.setLibelleInstrument("L'instrument ne doit pas avoir "
-                                             + "d'identifiant");
-            return new ResponseEntity<>((Instrument) null,
-                                        HttpStatus.BAD_REQUEST);
-        }
-        // Récupèration des éventuelles erreurs de validation du libellé de
-        // l'instrument
-        FieldError error = result.getFieldError("libelleInstrument");
-        if (error != null) {
-            errorResult.setLibelleInstrument(error.getDefaultMessage());
-            return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
-        }
-        try {
-            // Enregistrement de l'instrument
-            Instrument savedInstrument = service.saveInstrument(instrument);
-            return new ResponseEntity<>(savedInstrument, HttpStatus.CREATED);
-        } catch (DataIntegrityViolationException dive) {
-            SQLException sqle = (SQLException) dive.getRootCause();
-            if (sqle != null && sqle.getErrorCode() == 1062) {
-                // Violation de l'unicité des libellés des instruments
-                errorResult.setLibelleInstrument("Cet instrument existe déjà.");
-                return new ResponseEntity<>(errorResult,
-                                            HttpStatus.BAD_REQUEST);
-            } else {
-                errorResult.setLibelleInstrument("Erreur inconnue.");
-                return new ResponseEntity<>(errorResult,
-                                            HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+            final InstrumentCreateRequestDTO instrument) throws RessourceDupliqueeException {
+        // Enregistrement de l'instrument
+        InstrumentResponseDTO savedInstrument = service.createInstrument(instrument);
+        return new ResponseEntity<>(savedInstrument, HttpStatus.CREATED);
     }
 
     /**
@@ -218,14 +175,14 @@ public class InstrumentController {
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Ok",
+                            description = "Instrument trouvé",
                             content = @Content(
                                     mediaType = "application/json",
                                     examples = @ExampleObject(
                                             value = """
                                                     {
-                                                      "idInstrument":1,
-                                                      "libelleInstrument":"Harpe"
+                                                      "id":1,
+                                                      "nom":"Harpe"
                                                     }
                                                     """
                                     )
@@ -233,14 +190,16 @@ public class InstrumentController {
                     ),
                     @ApiResponse(
                             responseCode = "404",
-                            description = "Not Found",
+                            description = "Impossible de trouver l'instrument",
                             content = @Content(
                                     mediaType = "application/json",
                                     examples = @ExampleObject(
                                             value = """
                                                     {
-                                                      "idInstrument":null,
-                                                      "libelleInstrument":"string"
+                                                      "timestamp":"1970-01-01T00:00:00.0000000",
+                                                      "statut":404,
+                                                      "message":"Impossible de trouver l'instrument",
+                                                      "details":null
                                                     }
                                                     """
                                     )
@@ -248,24 +207,10 @@ public class InstrumentController {
                     )
             }
     )
-    public ResponseEntity<Instrument> getInstrument(
+    public InstrumentResponseDTO getInstrument(
             @PathVariable
-            final int id) {
-        Optional<Instrument> instrument = service.getInstrument(id);
-        if (instrument.isEmpty()) {
-            // Aucun instrument n'a l'identifiant donné dans l'URL.
-            /*
-            Instance d'instrument utilisée pour envoyer les messages d'erreur
-            accompagnée du code retour BAD_REQUEST, NOT_FOUND,
-            ou INTERNAL_SERVER_ERROR
-            */
-            Instrument errorResult = new Instrument();
-            errorResult.setLibelleInstrument("La ressource n'est pas "
-                                             + "disponible.");
-            return new ResponseEntity<>(errorResult,
-                                        HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(instrument.get(), HttpStatus.OK);
+            final int id) throws RessourceNonTrouveException {
+        return service.getInstrument(id);
     }
 
     /**
@@ -375,7 +320,7 @@ public class InstrumentController {
         accompagnée du code retour BAD_REQUEST, NOT_FOUND,
         ou INTERNAL_SERVER_ERROR
         */
-        Instrument errorResult = new Instrument();
+        /*Instrument errorResult = new Instrument();
         Optional<Instrument> optionalInstrument = service.getInstrument(id);
         if (optionalInstrument.isEmpty()) {
             // Aucun instrument n'a l'identifiant donné dans l'URL.
@@ -426,7 +371,8 @@ public class InstrumentController {
                 }
             }
         }
-        return new ResponseEntity<>(currentInstrument, HttpStatus.OK);
+        return new ResponseEntity<>(currentInstrument, HttpStatus.OK);*/
+        return new ResponseEntity<>((Instrument) null, HttpStatus.OK);
     }
 
     /**
