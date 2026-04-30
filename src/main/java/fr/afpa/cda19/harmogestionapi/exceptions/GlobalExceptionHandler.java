@@ -39,6 +39,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "Échec de la validation", errors);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleErreurGenerale(Exception e){
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Une erreur est survenue.", null);
+    }
+
     private ResponseEntity<ApiError> buildResponse(final HttpStatus status, final String message,
                                                    final Map<String, String> details) {
         ApiError error = new ApiError(LocalDateTime.now(), status.value(), message, details);
