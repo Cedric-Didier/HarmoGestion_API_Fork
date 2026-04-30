@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Model des cours.
@@ -85,5 +85,5 @@ public class Cours {
     @NotNull(message = "Le cours doit avoir des participants")
     @Size(max = 15, message = "Le nombre de participants doit être "
                               + "de 15 au maximum")
-    private List<Membre> participants;
+    private Set<Membre> participants;
 }

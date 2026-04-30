@@ -16,7 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Classe représentant un membre.
@@ -70,5 +70,5 @@ public class Membre {
 
     @OneToMany(mappedBy = "membre")
     @JsonManagedReference
-    private List<Pratiquer> pratiques;
+    private Set<Pratiquer> pratiques;
 }
