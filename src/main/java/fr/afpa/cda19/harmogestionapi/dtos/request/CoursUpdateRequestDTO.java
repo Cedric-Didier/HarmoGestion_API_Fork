@@ -33,7 +33,7 @@ public class CoursUpdateRequestDTO {
      * Date du cours.
      */
     @NotNull(message = "Le cours doit avoir une date.")
-    private LocalDateTime dateCours;
+    private LocalDateTime date;
 
     /**
      * Durée du cours (en min).
@@ -41,7 +41,7 @@ public class CoursUpdateRequestDTO {
     @NotNull(message = "Le cours doit avoir une durée.")
     @Min(value = 30, message = "Le cours doit durer au moins 30 minutes.")
     @Max(value = 120, message = "Le cours doit durer au maximum 120 minutes.")
-    private Byte dureeCours;
+    private Byte duree;
 
     /**
      * Enseignant.
