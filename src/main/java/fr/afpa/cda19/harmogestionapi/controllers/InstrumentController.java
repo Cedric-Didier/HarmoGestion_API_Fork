@@ -93,7 +93,7 @@ public class InstrumentController {
                             examples = @ExampleObject(
                                     value = """
                                             {
-                                             "libelleInstrument":"Harpe"
+                                             "nom":"Harpe"
                                             }
                                             """
                             )
@@ -108,8 +108,8 @@ public class InstrumentController {
                                     examples = @ExampleObject(
                                             value = """
                                                     {
-                                                      "idInstrument":15,
-                                                      "libelleInstrument":"Harpe"
+                                                      "id":15,
+                                                      "nom":"Harpe"
                                                     }
                                                     """
                                     )
