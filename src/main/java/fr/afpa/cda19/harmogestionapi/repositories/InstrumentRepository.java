@@ -12,5 +12,5 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface InstrumentRepository
         extends CrudRepository<Instrument, Integer> {
-
+    boolean existsByLibelleInstrument(String libelleInstrument);
 }
