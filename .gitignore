@@ -6,6 +6,8 @@ target/
 data.properties
 docker-compose.yml
 docker-compose.yaml
+.allure/
+allure-results/
 
 ### Log, target and Javadoc ###
 *.log
