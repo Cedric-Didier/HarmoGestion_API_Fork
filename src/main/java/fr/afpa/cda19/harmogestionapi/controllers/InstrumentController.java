@@ -102,7 +102,7 @@ public class InstrumentController {
             responses = {
                     @ApiResponse(
                             responseCode = "201",
-                            description = "Created",
+                            description = "Instrument créé",
                             content = @Content(
                                     mediaType = "application/json",
                                     examples = @ExampleObject(
@@ -117,29 +117,37 @@ public class InstrumentController {
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "Bad Request",
+                            description = "Échec de la validation du DTO",
                             content = @Content(
                                     mediaType = "application/json",
                                     examples = @ExampleObject(
                                             value = """
                                                     {
-                                                      "idInstrument":null,
-                                                      "libelleInstrument":"string"
+                                                      "timestamp":"1970-01-01T00:00:00.0000000",
+                                                      "statut":400,
+                                                      "message":"Échec de la validation",
+                                                      "details":[
+                                                                  {
+                                                                    "nom":"string"
+                                                                  }
+                                                                ]
                                                     }
                                                     """
                                     )
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "500",
-                            description = "Internal Server Error",
+                            responseCode = "409",
+                            description = "Duplication du nom d'un instrument",
                             content = @Content(
                                     mediaType = "application/json",
                                     examples = @ExampleObject(
                                             value = """
                                                     {
-                                                      "idInstrument":null,
-                                                      "libelleInstrument":"string"
+                                                      "timestamp":"1970-01-01T00:00:00.0000000",
+                                                      "statut":409,
+                                                      "message":"Cet instrument existe déjà",
+                                                      "details":null
                                                     }
                                                     """
                                     )
