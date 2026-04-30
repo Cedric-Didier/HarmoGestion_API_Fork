@@ -1,6 +1,7 @@
 package fr.afpa.cda19.harmogestionapi.models;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -68,7 +69,7 @@ public class Membre {
     @PastOrPresent(message = "Une date d'inscription ne peut pas être future.")
     private LocalDate dateInscriptionMembre;
 
-    @OneToMany(mappedBy = "membre")
+    @OneToMany(mappedBy = "membre", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private Set<Pratiquer> pratiques;
 }
