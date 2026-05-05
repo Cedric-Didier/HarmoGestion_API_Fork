@@ -12,5 +12,20 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface InstrumentRepository
         extends CrudRepository<Instrument, Integer> {
-    boolean existsByLibelleInstrument(String libelleInstrument);
+
+    /**
+     * Vérifie l'existence d'un instrument avec ce libellé.
+     * @param libelleInstrument libellé à tester
+     * @return true si un instrument possède ce libellé
+     */
+    boolean existsByLibelleInstrument(final String libelleInstrument);
+
+    /**
+     * Vérifie l'existence d'un autre instrument avec ce libellé.
+     * @param libelleInstrument libellé à tester
+     * @param idInstrument identifiant de l'instrument à exclure de la vérification
+     * @return true si un autre instrument possède ce libellé
+     */
+    boolean existsByLibelleInstrumentAndIdInstrumentNot(final String libelleInstrument,
+                                                        final Integer idInstrument);
 }
