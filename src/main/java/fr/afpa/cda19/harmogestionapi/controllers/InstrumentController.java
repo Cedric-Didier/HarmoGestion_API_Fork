@@ -1,33 +1,31 @@
 package fr.afpa.cda19.harmogestionapi.controllers;
 
 import fr.afpa.cda19.harmogestionapi.dtos.request.InstrumentCreateRequestDTO;
+import fr.afpa.cda19.harmogestionapi.dtos.request.InstrumentUpdateRequestDTO;
+import fr.afpa.cda19.harmogestionapi.dtos.response.ApiError;
 import fr.afpa.cda19.harmogestionapi.dtos.response.InstrumentResponseDTO;
+import fr.afpa.cda19.harmogestionapi.exceptions.IdNonCorrespondantException;
 import fr.afpa.cda19.harmogestionapi.exceptions.RessourceDupliqueeException;
 import fr.afpa.cda19.harmogestionapi.exceptions.RessourceNonTrouveException;
-import fr.afpa.cda19.harmogestionapi.models.Instrument;
 import fr.afpa.cda19.harmogestionapi.services.InstrumentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Contrôleur de gestion des requêtes concernant les instruments.
@@ -59,16 +57,7 @@ public class InstrumentController {
                     description = "Ok",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    value = """
-                                            [
-                                              {
-                                               "id":1,
-                                               "nom":"Harpe"
-                                              }
-                                            ]
-                                            """
-                            )
+                            schema = @Schema(implementation = InstrumentResponseDTO.class)
                     )
             )
     )
@@ -90,13 +79,7 @@ public class InstrumentController {
                     description = "l'instrument à enregistrer",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    value = """
-                                            {
-                                             "nom":"Harpe"
-                                            }
-                                            """
-                            )
+                            schema = @Schema(implementation = InstrumentCreateRequestDTO.class)
                     )
             ),
             responses = {
@@ -105,14 +88,7 @@ public class InstrumentController {
                             description = "Instrument créé",
                             content = @Content(
                                     mediaType = "application/json",
-                                    examples = @ExampleObject(
-                                            value = """
-                                                    {
-                                                      "id":15,
-                                                      "nom":"Harpe"
-                                                    }
-                                                    """
-                                    )
+                                    schema = @Schema(implementation = InstrumentResponseDTO.class)
                             )
                     ),
                     @ApiResponse(
@@ -120,20 +96,7 @@ public class InstrumentController {
                             description = "Échec de la validation du DTO",
                             content = @Content(
                                     mediaType = "application/json",
-                                    examples = @ExampleObject(
-                                            value = """
-                                                    {
-                                                      "timestamp":"1970-01-01T00:00:00.0000000",
-                                                      "statut":400,
-                                                      "message":"Échec de la validation",
-                                                      "details":[
-                                                                  {
-                                                                    "nom":"string"
-                                                                  }
-                                                                ]
-                                                    }
-                                                    """
-                                    )
+                                    schema = @Schema(implementation = ApiError.class)
                             )
                     ),
                     @ApiResponse(
@@ -141,16 +104,7 @@ public class InstrumentController {
                             description = "Duplication du nom d'un instrument",
                             content = @Content(
                                     mediaType = "application/json",
-                                    examples = @ExampleObject(
-                                            value = """
-                                                    {
-                                                      "timestamp":"1970-01-01T00:00:00.0000000",
-                                                      "statut":409,
-                                                      "message":"Cet instrument existe déjà",
-                                                      "details":null
-                                                    }
-                                                    """
-                                    )
+                                    schema = @Schema(implementation = ApiError.class)
                             )
                     )
             }
@@ -186,14 +140,7 @@ public class InstrumentController {
                             description = "Instrument trouvé",
                             content = @Content(
                                     mediaType = "application/json",
-                                    examples = @ExampleObject(
-                                            value = """
-                                                    {
-                                                      "id":1,
-                                                      "nom":"Harpe"
-                                                    }
-                                                    """
-                                    )
+                                    schema = @Schema(implementation = InstrumentResponseDTO.class)
                             )
                     ),
                     @ApiResponse(
@@ -201,16 +148,7 @@ public class InstrumentController {
                             description = "Impossible de trouver l'instrument",
                             content = @Content(
                                     mediaType = "application/json",
-                                    examples = @ExampleObject(
-                                            value = """
-                                                    {
-                                                      "timestamp":"1970-01-01T00:00:00.0000000",
-                                                      "statut":404,
-                                                      "message":"Impossible de trouver l'instrument",
-                                                      "details":null
-                                                    }
-                                                    """
-                                    )
+                                    schema = @Schema(implementation = ApiError.class)
                             )
                     )
             }
@@ -225,10 +163,12 @@ public class InstrumentController {
      * Endpoint de mise à jour d'un instrument.
      *
      * @param id         l'identifiant de l'instrument à modifier
-     * @param instrument L'instrument modifié
-     * @param result     Le résultat de la validation de l'instrument modifié
-     * @return la réponse contenant l'instrument modifié avec un code 200
-     * ou un message d'erreur avec un code 400 ou 500
+     * @param instrument Le DTO contenant l'instrument à modifier
+     * @return L'instrument modifié
+     * @throws RessourceNonTrouveException levée si l'instrument n'existe pas
+     * @throws RessourceDupliqueeException levée en cas de duplication du nom de l'instrument
+     * @throws IdNonCorrespondantException levée si l'id du DTO et le paramètre 'id' ne
+     *                                     correspondent pas
      */
     @PutMapping("/instrument/{id}")
     @Operation(
@@ -244,11 +184,12 @@ public class InstrumentController {
                     description = "l'instrument à enregistrer",
                     content = @Content(
                             mediaType = "application/json",
+                            schema = @Schema(implementation = InstrumentUpdateRequestDTO.class),
                             examples = @ExampleObject(
                                     value = """
                                             {
-                                              "idInstrument":1,
-                                              "libelleInstrument":"Harpe"
+                                              "id": 1,
+                                              "nom": "Harpe"
                                             }
                                             """
                             )
@@ -260,133 +201,51 @@ public class InstrumentController {
                             description = "Ok",
                             content = @Content(
                                     mediaType = "application/json",
-                                    examples = @ExampleObject(
-                                            value = """
-                                                    {
-                                                      "idInstrument":1,
-                                                      "libelleInstrument":"Harpe"
-                                                    }
-                                                    """
-                                    )
+                                    schema = @Schema(implementation = InstrumentResponseDTO.class)
                             )
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "Bad Request",
+                            description = "Échec de la validation du DTO",
                             content = @Content(
                                     mediaType = "application/json",
-                                    examples = @ExampleObject(
-                                            value = """
-                                                    {
-                                                      "idInstrument":null,
-                                                      "libelleInstrument":"string"
-                                                    }
-                                                    """
-                                    )
+                                    schema = @Schema(implementation = ApiError.class)
                             )
                     ),
                     @ApiResponse(
                             responseCode = "404",
-                            description = "Not Found",
+                            description = "Impossible de trouver l'instrument",
                             content = @Content(
                                     mediaType = "application/json",
-                                    examples = @ExampleObject(
-                                            value = """
-                                                    {
-                                                      "idInstrument":null,
-                                                      "libelleInstrument":"string"
-                                                    }
-                                                    """
-                                    )
+                                    schema = @Schema(implementation = ApiError.class)
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "500",
-                            description = "Internal Server Error",
+                            responseCode = "409",
+                            description = "Duplication du nom d'un instrument",
                             content = @Content(
                                     mediaType = "application/json",
-                                    examples = @ExampleObject(
-                                            value = """
-                                                    {
-                                                      "idInstrument":null,
-                                                      "libelleInstrument":"string"
-                                                    }
-                                                    """
-                                    )
+                                    schema = @Schema(implementation = ApiError.class)
                             )
                     )
             }
     )
-    public ResponseEntity<Instrument> updateInstrument(
+    public ResponseEntity<InstrumentResponseDTO> updateInstrument(
             @PathVariable
             final int id,
             @org.springframework.web.bind.annotation.RequestBody
             @Valid
-            final Instrument instrument, final BindingResult result) {
-        /*
-        Instance d'instrument utilisée pour envoyer les messages d'erreur
-        accompagnée du code retour BAD_REQUEST, NOT_FOUND,
-        ou INTERNAL_SERVER_ERROR
-        */
-        /*Instrument errorResult = new Instrument();
-        Optional<Instrument> optionalInstrument = service.getInstrument(id);
-        if (optionalInstrument.isEmpty()) {
-            // Aucun instrument n'a l'identifiant donné dans l'URL.
-            errorResult.setLibelleInstrument("La ressource n'est pas "
-                                             + "disponible.");
-            return new ResponseEntity<>(errorResult,
-                                        HttpStatus.NOT_FOUND);
-        }
-        Instrument currentInstrument = optionalInstrument.get();
-        // Vérification de la correspondance entre l'identifiant de l'URL
-        // et l'identifiant de l'instrument donné en paramètre.
-        if (instrument.getIdInstrument() != id) {
-            errorResult.setLibelleInstrument("L'instrument en paramètre n'a pas"
-                                             + " le même identifiant");
-            return new ResponseEntity<>(errorResult,
-                                        HttpStatus.BAD_REQUEST);
-        }
-        // Récupèration des éventuelles erreurs de validation du libellé de
-        // l'instrument
-        FieldError error = result.getFieldError("libelleInstrument");
-        if (error != null) {
-            errorResult.setLibelleInstrument(error.getDefaultMessage());
-            return new ResponseEntity<>(errorResult,
-                                        HttpStatus.BAD_REQUEST);
-        }
-        String libelle = instrument.getLibelleInstrument();
-        // Vérification de la présence d'une modification du nom de
-        // l'instrument
-        if (libelle != null && libelle.compareTo(
-                currentInstrument.getLibelleInstrument()) != 0) {
-            currentInstrument.setLibelleInstrument(libelle);
-            try {
-                service.saveInstrument(currentInstrument);
-            } catch (DataIntegrityViolationException dive) {
-                SQLException sqle = (SQLException) dive.getRootCause();
-                if (sqle != null && sqle.getErrorCode() == 1062) {
-                    // Violation de l'unicité des libellés des instruments
-                    errorResult.setLibelleInstrument("Cet instrument existe "
-                                                     + "déjà.");
-                    return new ResponseEntity<>(errorResult,
-                                                HttpStatus.BAD_REQUEST);
-                } else {
-                    errorResult.setLibelleInstrument("Erreur inconnue.");
-                    return new ResponseEntity<>(
-                            errorResult,
-                            HttpStatus.INTERNAL_SERVER_ERROR
-                    );
-                }
-            }
-        }
-        return new ResponseEntity<>(currentInstrument, HttpStatus.OK);*/
-        return new ResponseEntity<>((Instrument) null, HttpStatus.OK);
+            final InstrumentUpdateRequestDTO instrument)
+            throws RessourceDupliqueeException, IdNonCorrespondantException,
+            RessourceNonTrouveException {
+        return new ResponseEntity<>(service.updateInstrument(instrument, id), HttpStatus.OK);
     }
 
     /**
      * Endpoint de suppression d'un instrument.
      *
      * @param id l'identifiant de l'instrument à supprimer
+     * @throws RessourceNonTrouveException levée si l'instrument n'existe pas
      */
     @DeleteMapping("/instrument/{id}")
     @Operation(
@@ -396,11 +255,25 @@ public class InstrumentController {
                     description = "identifiant de l'instrument",
                     required = true,
                     example = "1"
-            )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Instrument supprimé"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Impossible de trouver l'instrument",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ApiError.class)
+                            )
+                    )
+            }
     )
     public void deleteInstrument(
             @PathVariable
-            final int id) {
+            final int id) throws RessourceNonTrouveException {
         service.deleteInstrument(id);
     }
 }
